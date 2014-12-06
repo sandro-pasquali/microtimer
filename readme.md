@@ -13,5 +13,5 @@ function() {
 	//	Do something 
 }
 timer.profile('myTimer');
-//	console > ⓘ Execution time (hr): 0s 2.90755ms
+//	console > ⓘ Execution time: 0s 2.90755ms
 ```

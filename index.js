@@ -1,27 +1,44 @@
+var util = require('util');
+
 module.exports = {
 	keys : {},
-	printf : "Execution time: %ds %dms",
-	profile : function(name) {
-		var end;
-		if(this.keys[name]) {
-			end = process.hrtime(this.keys[name]);
-			console.info(this.printf, end[0], end[1] / 1000000);
-			delete this.keys[name];
-			return;
-		}
+	printf : "Timer:%s %dns",
+	logger : function(name, ns, outStr) {
+		console.info(outStr);
+	},
+	set : function(name) {
 		if(Object.keys(this.keys).length > 50) {
-			return console.warn('More than 50 profiles are in flight. No more will be added. Probably some are not being completed.');
+			return console.warn('More than 50 timers are in flight. No more will be added. Try #clear.');
 		}
 		this.keys[name] = process.hrtime();
 	},
-	setStringFormat : function(str) {
+	get : function(name) {
+		var hr;
+		var ms;
+		if(this.keys[name]) {
+			hr = process.hrtime(this.keys[name]);
+			ns = hr[0] * 1e9 + hr[1];
+			return this.logger(name, ns, util.format(this.printf, name, ns));
+		}
+		throw new Error('Non-existent timer id passed to #get. Received: ' + name);
+	},
+	clear : function(key) {
+		if(key) {
+			delete this.keys[key];
+		} else {
+			this.keys = {};
+		}
+	},
+	setFormatting : function(str) {
 		if(typeof str !== 'string') {
-			return console.error('Must send a String to microtimer.setStringFormat(). Received: ' + str);
+			throw new Error('Must send a String to #setFormatting. Received: ' + str);
 		}
 		this.printf = str;
 	},
-	clearProfilers : function() {
-		this.keys = {};
+	setLogger : function(logF) {
+		if(typeof logF === "function") {
+			this.logger = logF;
+		}
 	}
 }
 

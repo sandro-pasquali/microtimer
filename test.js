@@ -1,11 +1,16 @@
 var timer = require('./index');
 
-timer.profile('one');
+timer.set('foo');
 setTimeout(function() {
-	timer.profile('one');
+	timer.get('foo');
+	//	Set logger to a function
+	timer.setLogger(function(name, ns, str) {
+		console.log("Timer:" + name + " second timeout " + (ns / 1e6) + "ms");
+	})
 }, 1000);
 
-timer.profile('two');
 setTimeout(function() {
-	timer.profile('two');
-}, 2000);
+	timer.get('foo');
+	//	Clears 'foo' timer
+	timer.clear('foo');
+},3000);
